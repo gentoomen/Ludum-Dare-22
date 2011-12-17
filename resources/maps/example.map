@@ -2,7 +2,7 @@
 	"map": {
 		"aliases": "default.aliases",
 		"layout": {
-			"pencilpot": [140 180 40 0],
+			"penpot": [140 180 40 0],
 			"plane1": [10 75 75 12]
 		},
 		"terrain": {
