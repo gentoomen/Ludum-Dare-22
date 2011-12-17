@@ -3,6 +3,7 @@ from pygame.locals import *
 from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from math import cos, sin
 
 pygame.init()
 viewport = (800,600)
@@ -31,11 +32,67 @@ glEnable(GL_DEPTH_TEST)
 glMatrixMode(GL_MODELVIEW)
 glEnable(GL_CULL_FACE)
 glCullFace(GL_BACK)
- 
+glEnable(GL_COLOR_MATERIAL)
+
+def makeFace():
+    glBegin(GL_POLYGON)
+    glNormal3f(0,0,1)
+    glVertex3f(0,1,0)
+    glVertex3f(0,0,0)
+    glVertex3f(1,0,0)
+    glVertex3f(1,1,0)
+    glEnd()
+
 rx, ry = (0,0)
 tx, ty = (0,0)
 zpos = 5
 rotate = move = False
+
+glq = gluNewQuadric()
+
+def makeCube():
+    glColor(0,1,0)
+    glPushMatrix()
+    makeFace()
+    glPopMatrix()
+    
+    glColor(0,1,1)
+    glPushMatrix()
+    glTranslate(1, 0, 0)
+    glRotate(90, 0, 1, 0)
+    makeFace()
+    glPopMatrix()
+    
+    glColor(1,0,1)
+    glPushMatrix()
+    glTranslate(0, 0, -1)
+    glRotate(-90, 0, 1, 0)
+    makeFace()
+    glPopMatrix() 
+ 
+    glColor(1,0,0)
+    glPushMatrix()
+    glTranslate(1, 0, -1)
+    glRotate(180, 0, 1, 0)
+    makeFace()
+    glPopMatrix()
+    
+    glColor(1,1,0)
+    glPushMatrix()
+    glTranslate(0, 1, 0)
+    glRotate(-90, 1, 0, 0)
+    makeFace()
+    glPopMatrix()
+    
+    glColor(0,0,1)
+    glPushMatrix()
+    glTranslate(0,0,-1)
+    glRotate(90, 1, 0, 0)
+    makeFace()
+    glPopMatrix()
+
+angle = 0
+
 while 1:
     clock.tick(30)
     
@@ -63,17 +120,16 @@ while 1:
             if move:
                 tx += i
                 ty -= j
- 
+    
     glTranslate(tx/20., ty/20., - zpos)
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
-
-    glBegin(GL_POLYGON)
-    glNormal3f(0,1,0)
-    glVertex3f(0,1,0)
-    glVertex3f(0,0,0)
-    glVertex3f(1,0,0)
-    glVertex3f(1,1,0)
-    glEnd()
- 
+    
+    angle += 0.1
+    
+    glPushMatrix()
+    glTranslate(sin(angle)*3, cos(angle)*3, 0)
+    makeCube()
+    glPopMatrix()
+    
     pygame.display.flip()
