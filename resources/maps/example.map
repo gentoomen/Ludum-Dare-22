@@ -4,13 +4,13 @@
 		"layout": {
 			//Each line specifies an object, with the key being the name of the alias
 			//and the array afterward describing the area on the map that it would be placed
-			"penpot": [140, 180, 40, 0],
-			"plane1": [10, 75, 75, 12]
+			"penpot": [140, 180, 40, 0, 90, 180],
+			"plane1": [10, 75, 75, 12, 0, 90, 180]
 		},
 		"terrain": {
-			[12 12 12 12],
-			[50 82 12 8008],
-			[1337 1337 1337 0]
+			[12, 12, 12, 12],
+			[50, 82, 12, 8008],
+			[1337, 1337, 1337, 0]
 		}
 	}
 }
