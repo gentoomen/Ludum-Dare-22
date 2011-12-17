@@ -2,8 +2,10 @@
 	"map": {
 		"aliases": "default.aliases",
 		"layout": {
-			"penpot": [140 180 40 0],
-			"plane1": [10 75 75 12]
+			//Each line specifies an object, with the key being the name of the alias
+			//and the array afterward describing the area on the map that it would be placed
+			"penpot": [140, 180, 40, 0],
+			"plane1": [10, 75, 75, 12]
 		},
 		"terrain": {
 			[12 12 12 12],
