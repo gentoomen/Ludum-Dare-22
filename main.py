@@ -1,4 +1,5 @@
 import sys, pygame
+
 from pygame.locals import *
 from pygame.constants import *
 from OpenGL.GL import *
@@ -16,9 +17,17 @@ hx = viewport[0]/2
 hy = viewport[1]/2
 srf = pygame.display.set_mode(viewport, OPENGL | DOUBLEBUF)
  
-glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 0.0))
-glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0))
-glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1.0))
+glq = gluNewQuadric()
+gluQuadricDrawStyle(glq, GLU_FILL);
+gluQuadricNormals(glq, GLU_SMOOTH);
+gluQuadricOrientation(glq, GLU_INSIDE);
+gluQuadricTexture(glq, GL_FALSE);
+ 
+light0pos = [0, 3, 0, 1]
+glLightfv(GL_LIGHT0, GL_POSITION, light0pos)
+glLightfv(GL_LIGHT0, GL_AMBIENT, (0.01, 0.01, 0.01, 1.0))
+glLightfv(GL_LIGHT0, GL_DIFFUSE, (1.0, 1.0, 1.0, 1.0))
+glLightfv(GL_LIGHT0, GL_SPECULAR, (0.7, 0.7, 0.7, 1.0))
 glEnable(GL_LIGHT0)
 glEnable(GL_LIGHTING)
 glEnable(GL_COLOR_MATERIAL)
@@ -110,10 +119,24 @@ def loadTexture(filename):
     return texid
 
 def crossProduct(x1, y1, z1, x2, y2, z2):
-    pass
+    return [y1*z2-z1*y2, z1*x2-x1*z2, x1*y2-y1*x2]
 
-def computeNormals(depthMap, x, y):
-    pass
+def computeNormals(Neighbors):
+    x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4 = Neighbors
+    
+    xf1, yf1, zf1 = crossProduct(x1,y1,z1,x2,y2,z2)
+    xf2, yf2, zf2 = crossProduct(x2,y2,z2,x3,y3,z3)
+    xf3, yf3, zf3 = crossProduct(x3,y3,z3,x4,y4,z4)
+    xf4, yf4, zf4 = crossProduct(x4,y4,z4,x1,y1,z1)
+    
+    return [abs(xf1+xf2+xf3+xf4), abs(yf1+yf2+yf3+yf4), abs(zf1+zf2+zf3+zf4)]
+
+def getValue(depthMap, x, y):
+    
+    if x >= 0 and x < len(depthMap[0]) and y >= 0 and y < len(depthMap):
+        return depthMap[y][x]
+    
+    return 0
 
 def generateTerrain(depthMap, texture):
     gl_list = glGenLists(1)
@@ -131,24 +154,66 @@ def generateTerrain(depthMap, texture):
             print x, y, texDeltaX, texDeltaY, currentDeltaX, currentDeltaY
             
             glBegin(GL_TRIANGLE_FAN)
-            glNormal(0,1,0)
+            
+            normals = computeNormals([x, depthMap[y][x], y,
+                                      x+1, depthMap[y][x+1], y,
+                                      x+1, depthMap[y+1][x+1], y+1,
+                                      x, depthMap[y+1][x], y+1
+                                      ])
+            
+            print normals
+            
+            glNormal(normals[0], normals[1], normals[2])
+            
             glTexCoord(currentDeltaX+texDeltaX/2., currentDeltaY+texDeltaY/2.)
             glVertex(x+0.5,
                     max(depthMap[y][x], depthMap[y][x+1], depthMap[y+1][x], depthMap[y+1][x+1])/2., 
                      y+0.5)
             
+            
+            firstnormals = computeNormals([x-1, getValue(depthMap, x-1, y), y,
+                                      x, getValue(depthMap, x, y-1), y-1,
+                                      x+1, getValue(depthMap, x+1, y), y,
+                                      x, getValue(depthMap, x, y+1), y+1
+                                      ])
+            print firstnormals
+            glNormal(firstnormals[0], firstnormals[1], firstnormals[2])
             glTexCoord(currentDeltaX, currentDeltaY)
             glVertex(x, depthMap[y][x], y)
             
+            
+            normals = computeNormals([x-1, getValue(depthMap, x-1, y+1), y+1,
+                                      x, getValue(depthMap, x, y+1-1), y+1-1,
+                                      x+1, getValue(depthMap, x+1, y+1), y+1,
+                                      x, getValue(depthMap, x, y+1+1), y+1+1
+                                      ])
+            print normals
+            glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX, currentDeltaY + texDeltaY)
             glVertex(x, depthMap[y+1][x], y+1)
             
+            normals = computeNormals([x+1-1, getValue(depthMap, x+1-1, y+1), y+1,
+                                      x+1, getValue(depthMap, x+1, y+1-1), y+1-1,
+                                      x+1+1, getValue(depthMap, x+1+1, y+1), y+1,
+                                      x+1, getValue(depthMap, x+1, y+1+1), y+1+1
+                                      ])
+            print normals
+            glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX + texDeltaX, currentDeltaY + texDeltaY)
             glVertex(x+1, depthMap[y+1][x+1], y+1)
             
+            normals = computeNormals([x+1-1, getValue(depthMap, x+1-1, y), y,
+                                      x+1, getValue(depthMap, x+1, y-1), y-1,
+                                      x+1+1, getValue(depthMap, x+1+1, y), y,
+                                      x+1, getValue(depthMap, x+1, y+1), y+1
+                                      ])
+            print normals
+            glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX + texDeltaX, currentDeltaY)
             glVertex(x+1, depthMap[y][x+1], y)
             
+            
+            glNormal(firstnormals[0], firstnormals[1], firstnormals[2])
             glTexCoord(currentDeltaX, currentDeltaY)
             glVertex(x, depthMap[y][x], y)
             
@@ -265,6 +330,18 @@ while 1:
             glPolygonMode(GL_FRONT, GL_FILL)
         elif e.type == KEYDOWN and e.key == K_t:
             glPolygonMode(GL_FRONT, GL_LINE)
+        elif e.type == KEYDOWN and e.key == K_i:
+            light0pos[1]+=0.1
+        elif e.type == KEYDOWN and e.key == K_k:
+            light0pos[1]-=0.1
+        elif e.type == KEYDOWN and e.key == K_j:
+            light0pos[0]-=0.1
+        elif e.type == KEYDOWN and e.key == K_l:
+            light0pos[0]+=0.1
+        elif e.type == KEYDOWN and e.key == K_u:
+            light0pos[2]-=0.1
+        elif e.type == KEYDOWN and e.key == K_h:
+            light0pos[2]+=0.1
         elif e.type == MOUSEBUTTONDOWN:
             if e.button == 4: zpos = max(1, zpos-1)
             elif e.button == 5: zpos += 1
@@ -286,6 +363,13 @@ while 1:
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
     
+    glPushMatrix()
+    glTranslate(light0pos[0],light0pos[1],light0pos[2])
+    gluSphere(glq, 0.5, 20, 20)
+    glPopMatrix()
+    
+    glLight(GL_LIGHT0, GL_POSITION, light0pos)
+    
     for gameObject in gameObjects:
         gameObject.render()
     
@@ -306,10 +390,12 @@ while 1:
     glVertex(0,5,0)
     glEnd()
     glPopMatrix()
+
     glDisable(GL_TEXTURE_2D)
     
     glCallList(terrainList)
     
+
 #    glPushMatrix()
 #    glColor(1,1,1)
 #    glDisable(GL_CULL_FACE)
@@ -327,3 +413,4 @@ while 1:
 #    glPopMatrix()
     
     pygame.display.flip()
+
