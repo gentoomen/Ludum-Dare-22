@@ -10,13 +10,13 @@ class SoundEngine():
 			song = pygame.mixer.Sound(songname)
 			self.library[songname] = song
 
-	def playTrack(self, songname, time=None):
+	def playTrack(self, songname, time=None, loop=0):
 		if songname not in self.library.keys():
 			addTrack(songname)
 		else:
 			if time == None:
 				time = self.lenTrack(songname)*1000
-			self.library[songname].play(maxtime=int(time))
+			self.library[songname].play(maxtime=int(time),loops=loop)
 	
 	def stopTrack(self, songname, fadeout=False):
 		if songname in self.library.keys():
