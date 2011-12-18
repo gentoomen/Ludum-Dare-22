@@ -17,7 +17,7 @@ The sound engine is incredibly simple and serves just to add to the functionalit
 >
 >*fadeout* Describes whether the song fades out, or whether it stops suddenly.
 
-####SoundEngine.setVolume(songname *string*, volume *float*)
+####SoundEngine.setVolume(songname *string*, volume=.5 *float*)
 
 >*songname* the name of the given song within the library.
 >
