@@ -104,8 +104,24 @@ chdir("../../")
 
 chdir("resources/sounds/")
 se = SoundEngine()
-se.playTrack("White_Noise.wav", 0)
+se.addTrack("rip.ogg")
+se.playTrack("rip.ogg", None, 5)
 chdir("../../")
+
+
+def loadTexture(filename):
+    surf = pygame.image.load(filename)
+    image = pygame.image.tostring(surf, 'RGBA', 1)
+    ix, iy = surf.get_rect().size
+    texid = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texid)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
+    
+    return texid
+
+skyTex = loadTexture("resources/textures/sky.bmp")
 
 while 1:
     clock.tick(30)
@@ -150,6 +166,26 @@ while 1:
     glTranslate(tx/20., ty/20., - zpos)
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
+    
+    
+    glEnable(GL_TEXTURE_2D)
+    glColor(1,1,1)
+    glBindTexture(GL_TEXTURE_2D, skyTex)
+    glPushMatrix()
+    glTranslate(-3, -2, -3)
+    glBegin(GL_POLYGON)
+    glNormal(0,0,1)
+    glTexCoord(0,0)
+    glVertex(0,0,0)
+    glTexCoord(1,0)
+    glVertex(5,0,0)
+    glTexCoord(1,1)
+    glVertex(5,5,0)
+    glTexCoord(0,1)
+    glVertex(0,5,0)
+    glEnd()
+    glPopMatrix()
+    glDisable(GL_TEXTURE_2D)
     
     glPushMatrix()
     glColor(1,1,1)
