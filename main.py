@@ -4,6 +4,8 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from math import cos, sin
+from os import chdir
+import resources.objloader as ol
 
 pygame.init()
 viewport = (800,600)
@@ -94,6 +96,10 @@ def makeCube():
 
 angle = 0
 
+chdir("resources/props/")
+obj1 = ol.OBJ("pencilpot.obj", swapyz=True)
+chdir("../../")
+
 while 1:
     clock.tick(30)
     
@@ -102,14 +108,14 @@ while 1:
     glLoadIdentity()
     glFrustum( -4/3*.04, 4/3*.04, -.04, .04, .1, 200.0 )
 
-    objx = angle*2 - 20
+    objx = angle - 20
     objy = cos(angle)*4
     angle += 0.1
     
     glMatrixMode( GL_MODELVIEW )
     glLoadIdentity()
     gluLookAt(0, 0, 4, 
-              objx, objy, 0, 
+              0, 0, 0, 
               0, 1, 0)
     
     for e in pygame.event.get():
@@ -134,9 +140,20 @@ while 1:
                 tx += i
                 ty -= j
     
-    #glTranslate(tx/20., ty/20., - zpos)
-    #glRotate(ry, 1, 0, 0)
-    #glRotate(rx, 0, 1, 0)
+    glTranslate(tx/20., ty/20., - zpos)
+    glRotate(ry, 1, 0, 0)
+    glRotate(rx, 0, 1, 0)
+    
+    glPushMatrix()
+    glColor(1,1,1)
+    glDisable(GL_CULL_FACE)
+    glEnable(GL_NORMALIZE)
+    glScale(0.3,0.3,0.3)
+    glRotate(-90,1,0,0)
+    glCallList(obj1.gl_list)
+    glDisable(GL_NORMALIZE)
+    glEnable(GL_CULL_FACE)
+    glPopMatrix()
     
     glPushMatrix()
     glTranslate(objx, objy, 0)
