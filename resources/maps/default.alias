@@ -1,0 +1,8 @@
+{
+	"objects":{
+		"penpot": "pencilpot.obj",
+		"plane1": "plane1.obj",
+		"plane2": "plane2.obj",
+		"turret1": "turret1.obj"
+	}
+}
