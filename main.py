@@ -8,6 +8,7 @@ from os import chdir
 import resources.objloader as ol
 import resources.sounds as snd
 from resources.sounds.soundengine import SoundEngine
+from resources.maps import readmap as rm
 
 pygame.init()
 viewport = (800,600)
@@ -95,20 +96,7 @@ def makeCube():
     glRotate(90, 1, 0, 0)
     makeFace()
     glPopMatrix()
-
-angle = 0
-
-chdir("resources/props/")
-obj1 = ol.OBJ("pencilpot.obj", swapyz=True)
-chdir("../../")
-
-chdir("resources/sounds/")
-se = SoundEngine()
-se.addTrack("rip.ogg")
-se.playTrack("rip.ogg", None, 5)
-chdir("../../")
-
-
+    
 def loadTexture(filename):
     surf = pygame.image.load(filename)
     image = pygame.image.tostring(surf, 'RGBA', 1)
@@ -121,7 +109,128 @@ def loadTexture(filename):
     
     return texid
 
+
+def generateTerrain(depthMap, texture):
+    gl_list = glGenLists(1)
+    glNewList(gl_list, GL_COMPILE)
+    glEnable(GL_TEXTURE_2D)
+    glFrontFace(GL_CCW)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    texDeltaX = 1./(len(depthMap[0]) - 1)
+    texDeltaY = 1./(len(depthMap) - 1)
+    currentDeltaY = 0
+    currentDeltaX = 0
+    
+    for y in range(len(depthMap) - 1):
+        for x in range(len(depthMap[0]) - 1):
+            print x, y, texDeltaX, texDeltaY, currentDeltaX, currentDeltaY
+            glBegin(GL_TRIANGLE_FAN)
+            glNormal(0,1,0)
+            glTexCoord(currentDeltaX+texDeltaX/2., currentDeltaY+texDeltaY/2.)
+            glVertex(x+0.5,
+                    max(depthMap[y][x], depthMap[y][x+1], depthMap[y+1][x], depthMap[y+1][x+1])/2., 
+                     y+0.5)
+            
+            glTexCoord(currentDeltaX, currentDeltaY)
+            glVertex(x, depthMap[y][x], y)
+            
+            glTexCoord(currentDeltaX, currentDeltaY + texDeltaY)
+            glVertex(x, depthMap[y+1][x], y+1)
+            
+            glTexCoord(currentDeltaX + texDeltaX, currentDeltaY + texDeltaY)
+            glVertex(x+1, depthMap[y+1][x+1], y+1)
+            
+            glTexCoord(currentDeltaX + texDeltaX, currentDeltaY)
+            glVertex(x+1, depthMap[y][x+1], y)
+            
+            glTexCoord(currentDeltaX, currentDeltaY)
+            glVertex(x, depthMap[y][x], y)
+            
+            
+            glEnd()
+#            glBegin(GL_POLYGON)
+#            
+#            glTexCoord(currentDeltaX, currentDeltaY)
+#            glVertex(x, depthMap[y][x], y)
+#            
+#            glTexCoord(currentDeltaX, currentDeltaY + texDeltaY)
+#            glVertex(x, depthMap[y+1][x], y+1)
+#            
+#            glTexCoord(currentDeltaX + texDeltaX, currentDeltaY + texDeltaY)
+#            glVertex(x+1, depthMap[y+1][x+1], y+1)
+#            
+#            glTexCoord(currentDeltaX + texDeltaX, currentDeltaY)
+#            glVertex(x+1, depthMap[y][x+1], y)
+#            
+#            glEnd()
+            
+            currentDeltaX += texDeltaX
+        
+        currentDeltaX = 0
+        currentDeltaY += texDeltaY
+    
+    glDisable(GL_TEXTURE_2D)
+    glEndList()
+    return gl_list
+
+
+angle = 0
+
+se = SoundEngine()
+se.addTrack("resources/sounds/rip.ogg")
+se.playTrack("resources/sounds/rip.ogg", None, 5)
+
+chdir("resources/maps/")
+gm = rm.GameMap()
+gm.parseFile("example.map")
+print gm.terrain
+chdir("../../")
+
 skyTex = loadTexture("resources/textures/sky.bmp")
+grassTex = loadTexture("resources/textures/grass.bmp")
+
+terrainList = generateTerrain(gm.terrain, grassTex)
+
+renderObjectStore = {}
+
+gameObjects = []
+
+class GameObject:
+    def __init__(self, filename, rotation, scale, position):
+        self.visible = True
+        self.filename = filename
+        self.rotx, self.roty, self.rotz = rotation
+        self.scalex, self.scaley, self.scalez = scale
+        self.posx, self.posy, self.posz = position
+        global renderObjectStore
+        if filename not in renderObjectStore.keys():
+            renderObject = ol.OBJ(self.filename, True)
+            self.renderObject = renderObject
+            renderObjectStore[filename] = renderObject
+            
+    def render(self):
+        if self.visible:
+            glDisable(GL_CULL_FACE)
+            glPushMatrix()
+            glEnable(GL_NORMALIZE)
+            glTranslate(self.posx, self.posy, self.posz)
+            glScale(self.scalex, self.scaley, self.scalez)
+            glRotate(self.rotx, 1, 0, 0)
+            glRotate(self.roty, 0, 1, 0)
+            glRotate(self.rotz, 0, 0, 1)
+            glCallList(renderObjectStore[self.filename].gl_list)
+            glPopMatrix()
+            glEnable(GL_CULL_FACE)
+        
+
+chdir("resources/props/")
+for gameObj in gm.objlist:
+    print gameObj.objfile
+    print gameObj.rotation
+    print gameObj.scale
+    print gameObj.position
+    gameObjects.append(GameObject(gameObj.objfile, gameObj.rotation, gameObj.scale, gameObj.position))
+chdir("../../")
 
 while 1:
     clock.tick(30)
@@ -131,9 +240,9 @@ while 1:
     glLoadIdentity()
     glFrustum( -4/3*.04, 4/3*.04, -.04, .04, .1, 200.0 )
 
-    objx = angle - 20
-    objy = cos(angle)*4
-    angle += 0.1
+#    objx = angle - 20
+#    objy = cos(angle)*4
+#    angle += 0.1
     
     glMatrixMode( GL_MODELVIEW )
     glLoadIdentity()
@@ -167,6 +276,8 @@ while 1:
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
     
+    for gameObject in gameObjects:
+        gameObject.render()
     
     glEnable(GL_TEXTURE_2D)
     glColor(1,1,1)
@@ -187,20 +298,22 @@ while 1:
     glPopMatrix()
     glDisable(GL_TEXTURE_2D)
     
-    glPushMatrix()
-    glColor(1,1,1)
-    glDisable(GL_CULL_FACE)
-    glEnable(GL_NORMALIZE)
-    glScale(0.3,0.3,0.3)
-    glRotate(-90,1,0,0)
-    glCallList(obj1.gl_list)
-    glDisable(GL_NORMALIZE)
-    glEnable(GL_CULL_FACE)
-    glPopMatrix()
+    glCallList(terrainList)
     
-    glPushMatrix()
-    glTranslate(objx, objy, 0)
-    makeCube()
-    glPopMatrix()
+#    glPushMatrix()
+#    glColor(1,1,1)
+#    glDisable(GL_CULL_FACE)
+#    glEnable(GL_NORMALIZE)
+#    glScale(0.3,0.3,0.3)
+#    glRotate(-90,1,0,0)
+#    glCallList(obj1.gl_list)
+#    glDisable(GL_NORMALIZE)
+#    glEnable(GL_CULL_FACE)
+#    glPopMatrix()
+    
+#    glPushMatrix()
+#    glTranslate(objx, objy, 0)
+#    makeCube()
+#    glPopMatrix()
     
     pygame.display.flip()
