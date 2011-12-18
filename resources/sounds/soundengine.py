@@ -12,7 +12,7 @@ class SoundEngine():
 
 	def playTrack(self, songname, time=None):
 		if songname not in self.library.keys():
-			addTrack(songname)
+			self.addTrack(songname)
 		else:
 			if time == None:
 				time = self.lenTrack(songname)*1000

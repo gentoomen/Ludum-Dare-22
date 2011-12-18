@@ -6,6 +6,8 @@ from OpenGL.GLU import *
 from math import cos, sin
 from os import chdir
 import resources.objloader as ol
+import resources.sounds as snd
+from resources.sounds.soundengine import SoundEngine
 
 pygame.init()
 viewport = (800,600)
@@ -98,6 +100,11 @@ angle = 0
 
 chdir("resources/props/")
 obj1 = ol.OBJ("pencilpot.obj", swapyz=True)
+chdir("../../")
+
+chdir("resources/sounds/")
+se = SoundEngine()
+se.playTrack("White_Noise.wav", 0)
 chdir("../../")
 
 while 1:
