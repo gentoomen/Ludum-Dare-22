@@ -15,7 +15,8 @@ class GameMap():
 		content = json.JSONDecoder().decode(line)
 
 		self.map = content['map']
-		self.terrain = content['map']['terrain']
+		self.terrain = content['map']['terrain']['height']
+		self.terraintex = content['map']['terrain']['texture']
 		self.layout = content['map']['layout']
 
 		self.schema = {}
@@ -28,10 +29,11 @@ class GameMap():
 		self.objlist = []
 
 		for alias in content['map']['aliases']:
+			#print alias
 			for mapobj in content['map']['layout']:
 				self.objlist.append(obj(
-				self.schema[alias]['objects'][mapobj],
-				self.layout[mapobj]['rotation'],
-				self.layout[mapobj]['scale'],
-				self.layout[mapobj]['position']
+				self.schema[alias]['objects'][mapobj['alias']],
+				mapobj['rotation'],
+				mapobj['scale'],
+				mapobj['position']
 				))
