@@ -11,9 +11,7 @@ class SoundEngine():
 			self.library[songname] = song
 
 	def playTrack(self, songname, time=None, loop=0):
-		if songname not in self.library.keys():
-			self.addTrack(songname)
-		else:
+		if songname in self.library.keys():
 			if time == None:
 				time = self.lenTrack(songname)*1000
 			self.library[songname].play(maxtime=int(time),loops=loop)

@@ -5,7 +5,7 @@ The sound engine is incredibly simple and serves just to add to the functionalit
 
 ####SoundEngine.playTrack(songname *string*, time=None *int*, loop=0 *int*)
 
->*songname* The name of the given song within the library. If it doesn't exist, an attempt to add it will be done.
+>*songname* The name of the given song within the library.
 >
 >*time* the time, in seconds, for the song to run. It will be converted to milliseconds.
 >
