@@ -109,6 +109,11 @@ def loadTexture(filename):
     
     return texid
 
+def crossProduct(x1, y1, z1, x2, y2, z2):
+    pass
+
+def computeNormals(depthMap, x, y):
+    pass
 
 def generateTerrain(depthMap, texture):
     gl_list = glGenLists(1)
@@ -124,6 +129,7 @@ def generateTerrain(depthMap, texture):
     for y in range(len(depthMap) - 1):
         for x in range(len(depthMap[0]) - 1):
             print x, y, texDeltaX, texDeltaY, currentDeltaX, currentDeltaY
+            
             glBegin(GL_TRIANGLE_FAN)
             glNormal(0,1,0)
             glTexCoord(currentDeltaX+texDeltaX/2., currentDeltaY+texDeltaY/2.)
@@ -255,6 +261,10 @@ while 1:
             sys.exit()
         elif e.type == KEYDOWN and e.key == K_ESCAPE:
             sys.exit()
+        elif e.type == KEYDOWN and e.key == K_r:
+            glPolygonMode(GL_FRONT, GL_FILL)
+        elif e.type == KEYDOWN and e.key == K_t:
+            glPolygonMode(GL_FRONT, GL_LINE)
         elif e.type == MOUSEBUTTONDOWN:
             if e.button == 4: zpos = max(1, zpos-1)
             elif e.button == 5: zpos += 1
