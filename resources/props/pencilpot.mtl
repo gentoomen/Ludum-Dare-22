@@ -1,9 +1,9 @@
-# Blender MTL File: 'pencilpot_FIN.blend'
+# Blender MTL File: ''
 # Material Count: 1
-newmtl penpot.tga_penpot.tga.001
-Ns 96.078431
+newmtl penpot.tga_penpot.tga_penpot.tga
+Ns 92.156863
 Ka 0.000000 0.000000 0.000000
-Kd 0.293333 0.293333 0.293333
+Kd 0.234666 0.234666 0.234666
 Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
