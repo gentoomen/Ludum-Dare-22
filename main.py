@@ -37,15 +37,15 @@ glEnable(GL_COLOR_MATERIAL)
 def makeFace():
     glBegin(GL_POLYGON)
     glNormal3f(0,0,1)
-    glVertex3f(0,1,0)
-    glVertex3f(0,0,0)
-    glVertex3f(1,0,0)
-    glVertex3f(1,1,0)
+    glVertex3f(-0.5,0.5,0)
+    glVertex3f(-0.5,-0.5,0)
+    glVertex3f(0.5,-0.5,0)
+    glVertex3f(0.5,0.5,0)
     glEnd()
 
 rx, ry = (0,0)
 tx, ty = (0,0)
-zpos = 5
+zpos = 10
 rotate = move = False
 
 glq = gluNewQuadric()
@@ -53,40 +53,41 @@ glq = gluNewQuadric()
 def makeCube():
     glColor(0,1,0)
     glPushMatrix()
+    glTranslate(0,0,0.5)
     makeFace()
     glPopMatrix()
     
     glColor(0,1,1)
     glPushMatrix()
-    glTranslate(1, 0, 0)
+    glTranslate(0.5, 0, 0)
     glRotate(90, 0, 1, 0)
     makeFace()
     glPopMatrix()
     
     glColor(1,0,1)
     glPushMatrix()
-    glTranslate(0, 0, -1)
+    glTranslate(-0.5, 0, 0)
     glRotate(-90, 0, 1, 0)
     makeFace()
     glPopMatrix() 
  
     glColor(1,0,0)
     glPushMatrix()
-    glTranslate(1, 0, -1)
+    glTranslate(0, 0, -0.5)
     glRotate(180, 0, 1, 0)
     makeFace()
     glPopMatrix()
     
     glColor(1,1,0)
     glPushMatrix()
-    glTranslate(0, 1, 0)
+    glTranslate(0, 0.5, 0)
     glRotate(-90, 1, 0, 0)
     makeFace()
     glPopMatrix()
     
     glColor(0,0,1)
     glPushMatrix()
-    glTranslate(0,0,-1)
+    glTranslate(0,-0.5,0)
     glRotate(90, 1, 0, 0)
     makeFace()
     glPopMatrix()
@@ -97,7 +98,19 @@ while 1:
     clock.tick(30)
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
+    glFrustum( -4/3*.04, 4/3*.04, -.04, .04, .1, 200.0 )
+
+    objx = angle*2 - 20
+    objy = cos(angle)*4
+    angle += 0.1
+    
+    glMatrixMode( GL_MODELVIEW )
+    glLoadIdentity()
+    gluLookAt(0, 0, 4, 
+              objx, objy, 0, 
+              0, 1, 0)
     
     for e in pygame.event.get():
         if e.type == QUIT:
@@ -121,14 +134,12 @@ while 1:
                 tx += i
                 ty -= j
     
-    glTranslate(tx/20., ty/20., - zpos)
-    glRotate(ry, 1, 0, 0)
-    glRotate(rx, 0, 1, 0)
-    
-    angle += 0.1
+    #glTranslate(tx/20., ty/20., - zpos)
+    #glRotate(ry, 1, 0, 0)
+    #glRotate(rx, 0, 1, 0)
     
     glPushMatrix()
-    glTranslate(sin(angle)*3, cos(angle)*3, 0)
+    glTranslate(objx, objy, 0)
     makeCube()
     glPopMatrix()
     
