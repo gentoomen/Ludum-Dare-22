@@ -1,9 +1,11 @@
 import json
 
 class obj():
-	def __init__(self, objfile=None):
+	def __init__(self, objfile=None, rot=None, scale=None, pos=None):
 		self.objfile = objfile
-		#other shit can go here too, this is just to test
+		self.rotation = rot
+		self.scale = scale
+		self.position = pos
 
 class GameMap():
 	def parseFile(self, addr):
@@ -27,4 +29,9 @@ class GameMap():
 
 		for alias in content['map']['aliases']:
 			for mapobj in content['map']['layout']:
-				self.objlist.append(obj(self.schema[alias]['objects'][mapobj]))
+				self.objlist.append(obj(
+				self.schema[alias]['objects'][mapobj],
+				self.layout[mapobj]['rotation'],
+				self.layout[mapobj]['scale'],
+				self.layout[mapobj]['position']
+				))
