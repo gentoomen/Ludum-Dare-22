@@ -23,7 +23,7 @@ gluQuadricNormals(glq, GLU_SMOOTH);
 gluQuadricOrientation(glq, GLU_INSIDE);
 gluQuadricTexture(glq, GL_FALSE);
  
-light0pos = [0, 3, 0, 1]
+light0pos = [0, 0, 5, 1]
 glLightfv(GL_LIGHT0, GL_POSITION, light0pos)
 glLightfv(GL_LIGHT0, GL_AMBIENT, (0.01, 0.01, 0.01, 1.0))
 glLightfv(GL_LIGHT0, GL_DIFFUSE, (1.0, 1.0, 1.0, 1.0))
@@ -129,7 +129,7 @@ def computeNormals(Neighbors):
     xf3, yf3, zf3 = crossProduct(x3,y3,z3,x4,y4,z4)
     xf4, yf4, zf4 = crossProduct(x4,y4,z4,x1,y1,z1)
     
-    return [abs(xf1+xf2+xf3+xf4), abs(yf1+yf2+yf3+yf4), abs(zf1+zf2+zf3+zf4)]
+    return [-(xf1+xf2+xf3+xf4), -(xf1+yf2+yf3+yf4), -(zf1+zf2+zf3+zf4)]
 
 def getValue(depthMap, x, y):
     
@@ -161,7 +161,7 @@ def generateTerrain(depthMap, texture):
                                       x, depthMap[y+1][x], y+1
                                       ])
             
-            print normals
+            print "Middle ", normals
             
             glNormal(normals[0], normals[1], normals[2])
             
@@ -171,12 +171,13 @@ def generateTerrain(depthMap, texture):
                      y+0.5)
             
             
+            
             firstnormals = computeNormals([x-1, getValue(depthMap, x-1, y), y,
                                       x, getValue(depthMap, x, y-1), y-1,
                                       x+1, getValue(depthMap, x+1, y), y,
                                       x, getValue(depthMap, x, y+1), y+1
                                       ])
-            print firstnormals
+            print "Top left ", firstnormals
             glNormal(firstnormals[0], firstnormals[1], firstnormals[2])
             glTexCoord(currentDeltaX, currentDeltaY)
             glVertex(x, depthMap[y][x], y)
@@ -187,7 +188,7 @@ def generateTerrain(depthMap, texture):
                                       x+1, getValue(depthMap, x+1, y+1), y+1,
                                       x, getValue(depthMap, x, y+1+1), y+1+1
                                       ])
-            print normals
+            print "Bottom left ", firstnormals
             glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX, currentDeltaY + texDeltaY)
             glVertex(x, depthMap[y+1][x], y+1)
@@ -197,7 +198,7 @@ def generateTerrain(depthMap, texture):
                                       x+1+1, getValue(depthMap, x+1+1, y+1), y+1,
                                       x+1, getValue(depthMap, x+1, y+1+1), y+1+1
                                       ])
-            print normals
+            print "Bottom right ", normals
             glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX + texDeltaX, currentDeltaY + texDeltaY)
             glVertex(x+1, depthMap[y+1][x+1], y+1)
@@ -207,7 +208,7 @@ def generateTerrain(depthMap, texture):
                                       x+1+1, getValue(depthMap, x+1+1, y), y,
                                       x+1, getValue(depthMap, x+1, y+1), y+1
                                       ])
-            print normals
+            print "Top right ", normals
             glNormal(normals[0], normals[1], normals[2])
             glTexCoord(currentDeltaX + texDeltaX, currentDeltaY)
             glVertex(x+1, depthMap[y][x+1], y)
@@ -275,7 +276,9 @@ class GameObject:
         self.posx, self.posy, self.posz = position
         global renderObjectStore
         if filename not in renderObjectStore.keys():
+            glDisable(GL_LIGHTING)
             renderObject = ol.OBJ(self.filename, True)
+            glEnable(GL_LIGHTING)
             self.renderObject = renderObject
             renderObjectStore[filename] = renderObject
             
@@ -331,17 +334,17 @@ while 1:
         elif e.type == KEYDOWN and e.key == K_t:
             glPolygonMode(GL_FRONT, GL_LINE)
         elif e.type == KEYDOWN and e.key == K_i:
-            light0pos[1]+=0.1
+            light0pos[1]+=0.5
         elif e.type == KEYDOWN and e.key == K_k:
-            light0pos[1]-=0.1
+            light0pos[1]-=0.5
         elif e.type == KEYDOWN and e.key == K_j:
-            light0pos[0]-=0.1
+            light0pos[0]-=0.5
         elif e.type == KEYDOWN and e.key == K_l:
-            light0pos[0]+=0.1
+            light0pos[0]+=0.5
         elif e.type == KEYDOWN and e.key == K_u:
-            light0pos[2]-=0.1
+            light0pos[2]-=0.5
         elif e.type == KEYDOWN and e.key == K_h:
-            light0pos[2]+=0.1
+            light0pos[2]+=0.5
         elif e.type == MOUSEBUTTONDOWN:
             if e.button == 4: zpos = max(1, zpos-1)
             elif e.button == 5: zpos += 1
