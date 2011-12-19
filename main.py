@@ -21,7 +21,7 @@ glq = gluNewQuadric()
 gluQuadricDrawStyle(glq, GLU_FILL);
 gluQuadricNormals(glq, GLU_SMOOTH);
 gluQuadricOrientation(glq, GLU_INSIDE);
-gluQuadricTexture(glq, GL_FALSE);
+gluQuadricTexture(glq, GL_TRUE);
  
 light0pos = [0, 0, 5, 1]
 glLightfv(GL_LIGHT0, GL_POSITION, light0pos)
@@ -245,7 +245,6 @@ def generateTerrain(depthMap, texture):
     glEndList()
     return gl_list
 
-
 angle = 0
 
 se = SoundEngine()
@@ -260,6 +259,13 @@ chdir("../../")
 
 skyTex = loadTexture("resources/textures/sky.bmp")
 grassTex = loadTexture("resources/textures/grass.bmp")
+
+skybox_back = loadTexture("resources/textures/skybox_back.tga")
+skybox_bottom = loadTexture("resources/textures/skybox_bottom.tga")
+skybox_front = loadTexture("resources/textures/skybox_front.tga")
+skybox_left = loadTexture("resources/textures/skybox_left.tga")
+skybox_right = loadTexture("resources/textures/skybox_right.tga")
+skybox_top = loadTexture("resources/textures/skybox_top.tga")
 
 terrainList = generateTerrain(gm.terrain, grassTex)
 
@@ -319,10 +325,184 @@ while 1:
 #    angle += 0.1
     
     glMatrixMode( GL_MODELVIEW )
+    
+    glPushMatrix()
     glLoadIdentity()
-    gluLookAt(0, 0, 4, 
-              0, 0, 0, 
-              0, 1, 0)
+#    gluLookAt(
+#        0,0,0,
+#        0,0,4,
+#        0,1,0);
+    glPushAttrib(GL_ENABLE_BIT)
+    glEnable(GL_TEXTURE_2D)
+    glDisable(GL_DEPTH_TEST)
+    glDisable(GL_LIGHTING)
+    glDisable(GL_BLEND)
+    glDepthMask(GL_FALSE)
+    glCullFace(GL_FRONT)    
+    glPushMatrix()          
+    glTranslatef(0,0,0)
+    glRotatef(ry,1,0,0)
+    glRotatef(rx,0,1,0)
+    glBindTexture(GL_TEXTURE_2D, skybox_front)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0)
+    glVertex3f(  0.5, -0.5, -0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f( -0.5, -0.5, -0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f( -0.5,  0.5, -0.5 )
+    glTexCoord2f(0, 1)
+    glVertex3f(  0.5,  0.5, -0.5 )
+    glEnd()
+ 
+    glBindTexture(GL_TEXTURE_2D, skybox_left);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0)
+    glVertex3f(  0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f(  0.5, -0.5, -0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f(  0.5,  0.5, -0.5 )
+    glTexCoord2f(0, 1)
+    glVertex3f(  0.5,  0.5,  0.5 )
+    glEnd();
+    
+    glBindTexture(GL_TEXTURE_2D, skybox_back)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0)
+    glVertex3f( -0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f(  0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f(  0.5,  0.5,  0.5 )
+    glTexCoord2f(0, 1)
+    glVertex3f( -0.5,  0.5,  0.5 )
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, skybox_right);
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0)
+    glVertex3f( -0.5, -0.5, -0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f( -0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f( -0.5,  0.5,  0.5 )
+    glTexCoord2f(0, 1)
+    glVertex3f( -0.5,  0.5, -0.5 )
+    glEnd()
+ 
+    glBindTexture(GL_TEXTURE_2D, skybox_top);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 1)
+    glVertex3f( -0.5,  0.5, -0.5 )
+    glTexCoord2f(0, 0)
+    glVertex3f( -0.5,  0.5,  0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f(  0.5,  0.5,  0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f(  0.5,  0.5, -0.5 )
+    glEnd();
+ 
+    glBindTexture(GL_TEXTURE_2D, skybox_bottom)
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0) 
+    glVertex3f( -0.5, -0.5, -0.5 )
+    glTexCoord2f(0, 1) 
+    glVertex3f( -0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f(  0.5, -0.5,  0.5 )
+    glTexCoord2f(1, 0)
+    glVertex3f(  0.5, -0.5, -0.5 )
+    glEnd()
+
+    glPopMatrix()
+
+    glCullFace(GL_BACK)
+    glDepthMask(GL_TRUE)
+
+    
+#    glPushAttrib(GL_ENABLE_BIT)
+#    glEnable(GL_TEXTURE_2D)
+#    glDisable(GL_DEPTH_TEST)
+#    glDisable(GL_LIGHTING)
+#    glDisable(GL_BLEND)
+# 
+#    glColor4f(1,1,1,1)
+#
+#    glBindTexture(GL_TEXTURE_2D, skybox_front)
+#    glBegin(GL_QUADS)
+#    glTexCoord2f(0, 0)
+#    glVertex3f(  0.5, -0.5, -0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f( -0.5, -0.5, -0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f( -0.5,  0.5, -0.5 )
+#    glTexCoord2f(0, 1)
+#    glVertex3f(  0.5,  0.5, -0.5 )
+#    glEnd()
+# 
+#    glBindTexture(GL_TEXTURE_2D, skybox_left);
+#    glBegin(GL_QUADS);
+#    glTexCoord2f(0, 0)
+#    glVertex3f(  0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f(  0.5, -0.5, -0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f(  0.5,  0.5, -0.5 )
+#    glTexCoord2f(0, 1)
+#    glVertex3f(  0.5,  0.5,  0.5 )
+#    glEnd();
+#    
+#    glBindTexture(GL_TEXTURE_2D, skybox_back)
+#    glBegin(GL_QUADS)
+#    glTexCoord2f(0, 0)
+#    glVertex3f( -0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f(  0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f(  0.5,  0.5,  0.5 )
+#    glTexCoord2f(0, 1)
+#    glVertex3f( -0.5,  0.5,  0.5 )
+#    glEnd();
+#
+#    glBindTexture(GL_TEXTURE_2D, skybox_right);
+#    glBegin(GL_QUADS)
+#    glTexCoord2f(0, 0)
+#    glVertex3f( -0.5, -0.5, -0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f( -0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f( -0.5,  0.5,  0.5 )
+#    glTexCoord2f(0, 1)
+#    glVertex3f( -0.5,  0.5, -0.5 )
+#    glEnd()
+# 
+#    glBindTexture(GL_TEXTURE_2D, skybox_top);
+#    glBegin(GL_QUADS);
+#    glTexCoord2f(0, 1)
+#    glVertex3f( -0.5,  0.5, -0.5 )
+#    glTexCoord2f(0, 0)
+#    glVertex3f( -0.5,  0.5,  0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f(  0.5,  0.5,  0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f(  0.5,  0.5, -0.5 )
+#    glEnd();
+# 
+#    glBindTexture(GL_TEXTURE_2D, skybox_bottom)
+#    glBegin(GL_QUADS);
+#    glTexCoord2f(0, 0) 
+#    glVertex3f( -0.5, -0.5, -0.5 )
+#    glTexCoord2f(0, 1) 
+#    glVertex3f( -0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 1)
+#    glVertex3f(  0.5, -0.5,  0.5 )
+#    glTexCoord2f(1, 0)
+#    glVertex3f(  0.5, -0.5, -0.5 )
+#    glEnd()
+ 
+    glPopAttrib()
+    glPopMatrix()
     
     for e in pygame.event.get():
         if e.type == QUIT:
@@ -362,6 +542,7 @@ while 1:
                 tx += i
                 ty -= j
     
+    glPushMatrix()
     glTranslate(tx/20., ty/20., - zpos)
     glRotate(ry, 1, 0, 0)
     glRotate(rx, 0, 1, 0)
@@ -378,27 +559,13 @@ while 1:
     
     glEnable(GL_TEXTURE_2D)
     glColor(1,1,1)
-    glBindTexture(GL_TEXTURE_2D, skyTex)
-    glPushMatrix()
-    glTranslate(-3, -2, -3)
-    glBegin(GL_POLYGON)
-    glNormal(0,0,1)
-    glTexCoord(0,0)
-    glVertex(0,0,0)
-    glTexCoord(1,0)
-    glVertex(5,0,0)
-    glTexCoord(1,1)
-    glVertex(5,5,0)
-    glTexCoord(0,1)
-    glVertex(0,5,0)
-    glEnd()
-    glPopMatrix()
 
     glDisable(GL_TEXTURE_2D)
     
     glCallList(terrainList)
+    glPopMatrix()
     
-
+    
 #    glPushMatrix()
 #    glColor(1,1,1)
 #    glDisable(GL_CULL_FACE)
