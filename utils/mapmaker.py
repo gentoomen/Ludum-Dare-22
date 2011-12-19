@@ -35,7 +35,7 @@ class tile():
 	def display(self, surface):
 		rc = (self.x*16, self.y*16, self.x+16, self.y+16)
 		pygame.draw.rect(surface,self.color, rc)
-		temp = font.render(str(self.h),0,(0,0,0))
+		temp = font.render(str(float(Decimal(self.h).quantize(Decimal('.1')))),0,(0,0,0))
 		screen.blit(temp,(self.x*16,self.y*16))
 
 width, height = (int(sys.argv[1])*16, int(sys.argv[2])*16)
