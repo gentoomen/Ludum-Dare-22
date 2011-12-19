@@ -138,14 +138,14 @@ def getValue(depthMap, x, y):
     
     return 0
 
-def generateTerrain(depthMap, texture):
+def generateTerrain(depthMap, texture, texXReps, texYReps):
     gl_list = glGenLists(1)
     glNewList(gl_list, GL_COMPILE)
     glEnable(GL_TEXTURE_2D)
     glFrontFace(GL_CCW)
     glBindTexture(GL_TEXTURE_2D, texture)
-    texDeltaX = 1./(len(depthMap[0]) - 1)
-    texDeltaY = 1./(len(depthMap) - 1)
+    texDeltaX = float(texXReps)/(len(depthMap[0]) - 1)
+    texDeltaY = float(texYReps)/(len(depthMap) - 1)
     currentDeltaY = 0
     currentDeltaX = 0
     
@@ -267,7 +267,10 @@ skybox_left = loadTexture("resources/textures/skybox_left.tga")
 skybox_right = loadTexture("resources/textures/skybox_right.tga")
 skybox_top = loadTexture("resources/textures/skybox_top.tga")
 
-terrainList = generateTerrain(gm.terrain, grassTex)
+terrainTex = loadTexture("resources/textures/" + gm.terraintex)
+terrainTexXReps = gm.terraintexxreps
+terrainTexYReps = gm.terraintexyreps
+terrainList = generateTerrain(gm.terrain, terrainTex, terrainTexXReps, terrainTexYReps)
 
 renderObjectStore = {}
 
