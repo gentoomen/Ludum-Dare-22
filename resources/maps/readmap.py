@@ -10,28 +10,30 @@ class obj():
 class GameMap():
 	def parseFile(self, addr):
 		f = open(addr,'r')
-		str = f.read()
+		line = f.read()
 		f.close()
-		content = json.JSONDecoder().decode(str)
+		content = json.JSONDecoder().decode(line)
 
 		self.map = content['map']
-		self.terrain = content['map']['terrain']
+		self.terrain = content['map']['terrain']['height']
+		self.terraintex = content['map']['terrain']['texture']
 		self.layout = content['map']['layout']
 
 		self.schema = {}
 		for i in content['map']['aliases']:
 			f = open(i,'r')
-			str = f.read()
+			line = f.read()
 			f.close()
-			self.schema[i] = json.JSONDecoder().decode(str)
+			self.schema[i] = json.JSONDecoder().decode(line)
 
 		self.objlist = []
 
 		for alias in content['map']['aliases']:
+			#print alias
 			for mapobj in content['map']['layout']:
 				self.objlist.append(obj(
-				self.schema[alias]['objects'][mapobj],
-				self.layout[mapobj]['rotation'],
-				self.layout[mapobj]['scale'],
-				self.layout[mapobj]['position']
+				self.schema[alias]['objects'][mapobj['alias']],
+				mapobj['rotation'],
+				mapobj['scale'],
+				mapobj['position']
 				))
