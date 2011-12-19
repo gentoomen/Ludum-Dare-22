@@ -407,15 +407,15 @@ while 1:
     glEnd();
  
     glBindTexture(GL_TEXTURE_2D, skybox_bottom)
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0) 
-    glVertex3f( -0.5, -0.5, -0.5 )
-    glTexCoord2f(0, 1) 
-    glVertex3f( -0.5, -0.5,  0.5 )
-    glTexCoord2f(1, 1)
-    glVertex3f(  0.5, -0.5,  0.5 )
+    glBegin(GL_QUADS)
     glTexCoord2f(1, 0)
     glVertex3f(  0.5, -0.5, -0.5 )
+    glTexCoord2f(1, 1)
+    glVertex3f(  0.5, -0.5,  0.5 )
+    glTexCoord2f(0, 1) 
+    glVertex3f( -0.5, -0.5,  0.5 )
+    glTexCoord2f(0, 0) 
+    glVertex3f( -0.5, -0.5, -0.5 )
     glEnd()
 
     glPopMatrix()
