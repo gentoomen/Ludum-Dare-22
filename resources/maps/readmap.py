@@ -17,6 +17,9 @@ class GameMap():
 		self.map = content['map']
 		self.terrain = content['map']['terrain']['height']
 		self.terraintex = content['map']['terrain']['texture']
+		self.terraintexyreps = float(content['map']['terrain']['texturexreps'])
+		self.terraintexxreps = float(content['map']['terrain']['textureyreps'])
+		
 		self.layout = content['map']['layout']
 
 		self.schema = {}
